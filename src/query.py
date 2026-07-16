@@ -39,7 +39,7 @@ def query_gem(prompt: str) -> str:
     for attempt in range(MAX_RETRIES):
         try:
             response = _client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-flash-latest",
                 contents=prompt
             )
             return response.text if response.text else ""
