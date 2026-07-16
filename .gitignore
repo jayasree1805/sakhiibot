@@ -10,6 +10,5 @@ __pycache__/
 .streamlit/secrets.toml
 
 # Large / generated data
-data/medical_kb.txt
 data/eval_results.json
 data/chroma_db/
