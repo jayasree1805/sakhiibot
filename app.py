@@ -22,67 +22,143 @@ from src.emergency import check_emergency, EMERGENCY_RESPONSE
 
 st.set_page_config(page_title="Sakhii Bot", page_icon="🩺", layout="centered")
 
-# ── Tighten layout / deepen contrast ──────────────────────────────
+# ── Layout / typography ──────────────────────────────
 st.markdown("""
 <style>
-    /* Reduce big empty top gap */
+    /* Widen the content column so the page doesn't look empty */
     .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
-        max-width: 780px;
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 900px;
     }
 
-    /* Compact the title */
+    /* Bump base font size across the app */
+    html, body, [class*="css"], p, li, span {
+        font-size: 1rem !important;
+    }
+
+    /* Title */
     h1 {
-        font-size: 1.9rem !important;
-        margin-bottom: 0.2rem !important;
+        font-size: 2.4rem !important;
+        margin-bottom: 0.3rem !important;
+        color: #BE0056 !important;
     }
 
-    /* Tighter caption under title */
+    /* Caption under title */
     [data-testid="stCaptionContainer"] {
-        margin-bottom: 0.6rem !important;
-    }
-
-    /* Disclaimer info box: less padding, darker text for contrast */
-    div[data-testid="stAlert"] {
-        padding: 0.6rem 0.9rem !important;
-        margin-bottom: 0.8rem !important;
-    }
-    div[data-testid="stAlert"] p {
-        color: #3a2430 !important;
-        font-size: 0.9rem !important;
-    }
-
-    /* Sidebar: deepen background, darken labels for contrast */
-    section[data-testid="stSidebar"] {
-        background-color: #FFD1CE !important;
-    }
-    section[data-testid="stSidebar"] label {
-        color: #5A1030 !important;
-        font-weight: 600 !important;
-    }
-    section[data-testid="stSidebar"] h2 {
+        font-size: 1rem !important;
+        margin-bottom: 1rem !important;
         color: #7A0038 !important;
     }
 
-    /* Buttons: solid, higher-contrast magenta */
-    button[kind="secondary"], .stButton button {
-        border: 1.5px solid #BE0056 !important;
-        color: #BE0056 !important;
+    /* Disclaimer info box - light pink now used sparingly as an accent tint */
+    div[data-testid="stAlert"] {
+        padding: 0.9rem 1.1rem !important;
+        margin-bottom: 1.2rem !important;
+        background-color: #FFF0EF !important;
+        border-left: 4px solid #BE0056 !important;
+    }
+    div[data-testid="stAlert"] p {
+        color: #3a2430 !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Sidebar background - dark magenta now dominant */
+    section[data-testid="stSidebar"] {
+        background-color: #BE0056 !important;
+    }
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 2rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+    }
+    section[data-testid="stSidebar"] h2 {
+        color: #FFFFFF !important;
+        font-size: 1.35rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+    section[data-testid="stSidebar"] label {
+        color: #FFD1CE !important;
         font-weight: 600 !important;
+        font-size: 0.95rem !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+        color: #FFE3E1 !important;
+    }
+    section[data-testid="stSidebar"] input,
+    section[data-testid="stSidebar"] textarea {
+        font-size: 0.95rem !important;
+        padding: 0.5rem 0.7rem !important;
+        color: #2B1420 !important;
+        background-color: #FFFFFF !important;
+    }
+    /* Radio button label text inside sidebar */
+    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+        color: #FFD1CE !important;
+    }
+    /* Tighten the vertical gaps between sidebar widgets */
+    section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
+        gap: 0.35rem !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stTextInput"],
+    section[data-testid="stSidebar"] [data-testid="stRadio"] {
+        margin-bottom: -0.3rem !important;
+    }
+    /* Sidebar buttons: white fill so they stand out against the magenta bg */
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #FFFFFF !important;
+        border: 1.5px solid #FFFFFF !important;
+        color: #BE0056 !important;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #FFD1CE !important;
+        border-color: #FFD1CE !important;
+        color: #7A0038 !important;
+    }
+    section[data-testid="stSidebar"] hr {
+        border-color: #E0A0AE !important;
+    }
+
+    /* Main-area buttons: solid dark magenta fill */
+    button[kind="secondary"], .stButton button {
+        background-color: #BE0056 !important;
+        border: 1.5px solid #BE0056 !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        padding: 0.55rem 1rem !important;
+        white-space: normal !important;
+        height: auto !important;
+        line-height: 1.3 !important;
     }
     .stButton button:hover {
-        background-color: #BE0056 !important;
+        background-color: #7A0038 !important;
+        border-color: #7A0038 !important;
         color: white !important;
     }
 
-    /* Chat messages: reduce vertical gaps between turns */
+    /* Chat messages */
     div[data-testid="stChatMessage"] {
-        padding-top: 0.35rem !important;
-        padding-bottom: 0.35rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        font-size: 1.02rem !important;
+    }
+    div[data-testid="stChatMessage"] p {
+        font-size: 1.02rem !important;
+    }
+    /* Assistant bubble gets a subtle magenta accent border */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
+        border-left: 3px solid #BE0056 !important;
+        padding-left: 0.6rem !important;
     }
 
-    /* Chat input: darker placeholder text for contrast */
+    /* Chat input */
+    div[data-testid="stChatInput"] {
+        border: 1.5px solid #BE0056 !important;
+    }
+    div[data-testid="stChatInput"] textarea {
+        font-size: 1rem !important;
+    }
     div[data-testid="stChatInput"] textarea::placeholder {
         color: #8a5560 !important;
         opacity: 1 !important;
