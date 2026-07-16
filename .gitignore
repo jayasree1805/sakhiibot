@@ -7,6 +7,7 @@ __pycache__/
 
 # Secrets
 .env
+.streamlit/secrets.toml
 
 # Large / generated data
 data/medical_kb.txt
