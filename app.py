@@ -357,7 +357,7 @@ if _has_logo:
         <div style="text-align:center; margin-top: -0.5rem;">
             <h1 style="margin-bottom:0.2rem;">Sakhii Bot</h1>
             <p style="color:#7A0038; font-size:1.15rem; margin-top:0; font-weight:500;">
-                Your personal health assistant — Sakhii Care Foundation
+                Your personal health assistant — Developed with love by Sakhii Care Foundation
             </p>
         </div>
         """,
