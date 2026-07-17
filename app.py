@@ -20,7 +20,14 @@ from src.analyzer import analyze_query, detect_and_translate, translate_response
 from src.query import query_gem
 from src.emergency import check_emergency, EMERGENCY_RESPONSE
 
-st.set_page_config(page_title="Sakhii Bot", page_icon="🩺", layout="centered")
+LOGO_PATH = "assets/logo.png"  # drop your logo file here (PNG with transparent background works best)
+_has_logo = os.path.exists(LOGO_PATH)
+
+st.set_page_config(
+    page_title="Sakhii Bot",
+    page_icon=LOGO_PATH if _has_logo else "🩺",
+    layout="centered",
+)
 
 # ── Layout / typography ──────────────────────────────
 st.markdown("""
@@ -32,26 +39,37 @@ st.markdown("""
         max-width: 900px;
     }
 
-    /* Bump base font size across the app */
-    html, body, [class*="css"], p, li, span {
-        font-size: 1rem !important;
+    /* Force a bigger base font everywhere. Streamlit's own CSS is loaded
+       after ours, so we target the actual text-bearing elements directly
+       instead of relying on inheritance from html/body. */
+    p, li, label, span, div[data-testid="stMarkdownContainer"],
+    div[data-testid="stMarkdownContainer"] p {
+        font-size: 1.05rem !important;
+        line-height: 1.5 !important;
     }
 
-    /* Title */
-    h1 {
-        font-size: 2.4rem !important;
+    /* Title — targeted at every level Streamlit might wrap it in, so
+       specificity ties always resolve in our favor */
+    h1,
+    h1 *,
+    div[data-testid="stMarkdownContainer"] h1,
+    div[data-testid="stHeading"] h1,
+    [data-testid="stAppViewContainer"] h1 {
+        font-size: 3rem !important;
         margin-bottom: 0.3rem !important;
         color: #BE0056 !important;
+        font-weight: 800 !important;
     }
 
-    /* Caption under title */
-    [data-testid="stCaptionContainer"] {
-        font-size: 1rem !important;
+    /* Caption under title (main area) */
+    div.stCaption,
+    [data-testid="stCaptionContainer"] p {
+        font-size: 1.1rem !important;
         margin-bottom: 1rem !important;
         color: #7A0038 !important;
     }
 
-    /* Disclaimer info box - light pink now used sparingly as an accent tint */
+    /* Disclaimer info box */
     div[data-testid="stAlert"] {
         padding: 0.9rem 1.1rem !important;
         margin-bottom: 1.2rem !important;
@@ -60,10 +78,10 @@ st.markdown("""
     }
     div[data-testid="stAlert"] p {
         color: #3a2430 !important;
-        font-size: 0.95rem !important;
+        font-size: 1rem !important;
     }
 
-    /* Sidebar background - dark magenta now dominant */
+    /* ── Sidebar ────────────────────────────────────── */
     section[data-testid="stSidebar"] {
         background-color: #BE0056 !important;
     }
@@ -74,43 +92,79 @@ st.markdown("""
     }
     section[data-testid="stSidebar"] h2 {
         color: #FFFFFF !important;
-        font-size: 1.35rem !important;
+        font-size: 1.5rem !important;
         margin-bottom: 0.2rem !important;
     }
-    section[data-testid="stSidebar"] label {
-        color: #FFD1CE !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-    }
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    /* All sidebar text (labels, radio options, captions) large + light */
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] {
         color: #FFE3E1 !important;
+        font-weight: 600 !important;
+        font-size: 1.05rem !important;
     }
     section[data-testid="stSidebar"] input,
     section[data-testid="stSidebar"] textarea {
-        font-size: 0.95rem !important;
-        padding: 0.5rem 0.7rem !important;
+        font-size: 1.05rem !important;
+        padding: 0.6rem 0.8rem !important;
         color: #2B1420 !important;
         background-color: #FFFFFF !important;
+        font-weight: 400 !important;
     }
-    /* Radio button label text inside sidebar */
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-        color: #FFD1CE !important;
-    }
-    /* Tighten the vertical gaps between sidebar widgets */
+
+    /* Normal, non-overlapping spacing between sidebar widgets
+       (no negative margins — those caused elements to stack on top
+       of each other). A small explicit gap is enough to tighten things. */
     section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
-        gap: 0.35rem !important;
+        gap: 0.6rem !important;
     }
-    section[data-testid="stSidebar"] [data-testid="stTextInput"],
-    section[data-testid="stSidebar"] [data-testid="stRadio"] {
-        margin-bottom: -0.3rem !important;
+
+    /* ── Main-area buttons: solid dark magenta fill ──── */
+    /* Force color/background on the button AND every element nested
+       inside it (Streamlit wraps button text in a <p> or <div>, which
+       can otherwise silently keep its own inherited/disabled-looking
+       color even after we style the <button> itself). */
+    button[kind="secondary"],
+    button[kind="secondary"] *,
+    .stButton button,
+    .stButton button * {
+        background-color: transparent;
+        color: #FFFFFF !important;
     }
-    /* Sidebar buttons: white fill so they stand out against the magenta bg */
-    section[data-testid="stSidebar"] .stButton button {
+    button[kind="secondary"],
+    .stButton button {
+        background-color: #BE0056 !important;
+        border: 1.5px solid #BE0056 !important;
+        font-weight: 600 !important;
+        font-size: 1.05rem !important;
+        padding: 0.6rem 1rem !important;
+        white-space: normal !important;
+        height: auto !important;
+        line-height: 1.3 !important;
+        opacity: 1 !important;
+    }
+    .stButton button:hover {
+        background-color: #7A0038 !important;
+        border-color: #7A0038 !important;
+    }
+    .stButton button:hover * {
+        color: #FFFFFF !important;
+    }
+
+    /* Sidebar buttons: white fill so they stand out against the magenta
+       bg — must come AFTER the generic rule above so it wins the cascade,
+       and must also target nested elements the same way. */
+    section[data-testid="stSidebar"] .stButton button,
+    section[data-testid="stSidebar"] .stButton button * {
         background-color: #FFFFFF !important;
-        border: 1.5px solid #FFFFFF !important;
         color: #BE0056 !important;
     }
-    section[data-testid="stSidebar"] .stButton button:hover {
+    section[data-testid="stSidebar"] .stButton button {
+        border: 1.5px solid #FFFFFF !important;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover,
+    section[data-testid="stSidebar"] .stButton button:hover * {
         background-color: #FFD1CE !important;
         border-color: #FFD1CE !important;
         color: #7A0038 !important;
@@ -119,32 +173,13 @@ st.markdown("""
         border-color: #E0A0AE !important;
     }
 
-    /* Main-area buttons: solid dark magenta fill */
-    button[kind="secondary"], .stButton button {
-        background-color: #BE0056 !important;
-        border: 1.5px solid #BE0056 !important;
-        color: #FFFFFF !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        padding: 0.55rem 1rem !important;
-        white-space: normal !important;
-        height: auto !important;
-        line-height: 1.3 !important;
-    }
-    .stButton button:hover {
-        background-color: #7A0038 !important;
-        border-color: #7A0038 !important;
-        color: white !important;
-    }
-
     /* Chat messages */
     div[data-testid="stChatMessage"] {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-        font-size: 1.02rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.6rem !important;
     }
     div[data-testid="stChatMessage"] p {
-        font-size: 1.02rem !important;
+        font-size: 1.08rem !important;
     }
     /* Assistant bubble gets a subtle magenta accent border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
@@ -152,16 +187,26 @@ st.markdown("""
         padding-left: 0.6rem !important;
     }
 
-    /* Chat input */
-    div[data-testid="stChatInput"] {
+    /* Chat input — force white regardless of theme background vars */
+    div[data-testid="stChatInput"],
+    div[data-testid="stChatInput"] > div {
+        background-color: #FFFFFF !important;
         border: 1.5px solid #BE0056 !important;
     }
     div[data-testid="stChatInput"] textarea {
-        font-size: 1rem !important;
+        background-color: #FFFFFF !important;
+        color: #2B1420 !important;
+        font-size: 1.05rem !important;
     }
     div[data-testid="stChatInput"] textarea::placeholder {
         color: #8a5560 !important;
         opacity: 1 !important;
+    }
+    div[data-testid="stChatInput"] button {
+        background-color: #BE0056 !important;
+    }
+    div[data-testid="stChatInput"] button svg {
+        fill: #FFFFFF !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -303,8 +348,24 @@ with st.sidebar:
 
 
 # ── Main chat UI ────────────────────────────────────────────────────
-st.title("🩺 Sakhii Bot")
-st.caption("Your personal health assistant — Sakhii Care Foundation")
+if _has_logo:
+    logo_col1, logo_col2, logo_col3 = st.columns([1, 1, 1])
+    with logo_col2:
+        st.image(LOGO_PATH, width=170)
+    st.markdown(
+        """
+        <div style="text-align:center; margin-top: -0.5rem;">
+            <h1 style="margin-bottom:0.2rem;">Sakhii Bot</h1>
+            <p style="color:#7A0038; font-size:1.15rem; margin-top:0; font-weight:500;">
+                Your personal health assistant — Sakhii Care Foundation
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.title("Sakhii Bot")
+    st.caption("Your personal health assistant — Developed with love by Sakhii Care Foundation")
 
 n_chunks = initialize()
 
